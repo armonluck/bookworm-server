@@ -4,7 +4,7 @@ const cors = require('cors');
 const server = require('http').createServer(app);
 const { Server } = require('socket.io');
 
-// Allows for secret variables to be pulled in from .env file
+// Allows for url variables to be pulled in from .env file
 require('dotenv').config();
 const { CORS_ORIGIN, BACKEND_URL, PORT } = process.env;
 
@@ -14,20 +14,24 @@ app.use(express.json());
 app.use(express.static('public'));
 
 // Regular HTTP Requests
-app.get("/", (req,res) => {  
+app.get("/", (req, res) => {
     return res.send('Hello Socket.io World!');
 })
 
 // Socket.io
 const io = new Server(server, {
     cors: {
-        origin: { CORS_ORIGIN }, 
+        origin: { CORS_ORIGIN },
         methods: ['GET', 'POST', 'PUT', 'DELETE']
     },
 });
 
 io.on('connection', (socket) => {
     console.log(`User Connected: ${socket.id}`);
+
+    socket.on('disconnect', () => {
+        console.log("User disconnected", socket.id);
+    })
 })
 
 server.listen(PORT, () => {
